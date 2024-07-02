@@ -1,0 +1,20 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <h1 class="my-4">Articles</h1>
+    <div class="row">
+        {% for article in articles %}
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title"><a href="{% url 'article_detail' article.id %}">{{ article.title }}</a></h5>
+                        <p class="card-text">{{ article.content|truncatewords:30 }}</p>
+                        <a href="{% url 'article_detail' article.id %}" class="btn btn-success">View details &raquo;</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

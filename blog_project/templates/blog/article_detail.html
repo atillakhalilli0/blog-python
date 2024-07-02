@@ -1,0 +1,70 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <h1>{{ article.title }}</h1>
+            <p>{{ article.content }}</p>
+            <p>Author: {{ article.author.username }}</p>
+            <p>Categories: 
+                {% for category in article.categories.all %}
+                    {{ category.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+            <p>Likes: <span id="likes-count">{{ article.likes.count }}</span></p>
+            <button id="like-button" class="btn btn-primary" data-liked="{{ is_liked }}">{{ is_liked|yesno:"Unlike,Like" }}</button>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <h2>Comments</h2>
+            {% for comment in comments %}
+                <div class="card my-3">
+                    <div class="card-body">
+                        <p><strong>{{ comment.author.username }}</strong>: {{ comment.content }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+            <h3>Add a Comment</h3>
+            {% if request.user.is_authenticated %}
+            <form method="post" class="mb-3">
+                {% csrf_token %}
+                {{ comment_form.as_p }}
+                <button type="submit" class="btn btn-primary">Post Comment</button>
+            </form>
+            {% else %}
+            <p>You must be logged in to post a comment.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<script>
+document.getElementById('like-button').addEventListener('click', function() {
+    const button = this;
+    const articleId = {{ article.id }};
+    const csrfToken = '{{ csrf_token }}';
+    const liked = button.getAttribute('data-liked') === 'True';
+    const url = '{% url "like_article" article.id %}';
+    
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+        } else {
+            document.getElementById('likes-count').innerText = data.likes_count;
+            button.setAttribute('data-liked', data.liked);
+            button.innerText = data.liked ? 'Unlike' : 'Like';
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
+</script>
+{% endblock %}
