@@ -5,4 +5,3 @@
 5. daha sonra python manage.py migrate yazın
 6. terminalda python manage.py runserver yazın və terminalda verilən linkə daxil olun
 7. Sign Up hissəsində verilən zərurətlərə əsasən qeydiyyatdan keçin
-8. 
